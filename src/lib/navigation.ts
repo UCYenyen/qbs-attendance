@@ -35,6 +35,8 @@ export function homePathForRole(role: UserRole): string {
   switch (role) {
     case "admin":
       return "/admin"
+    case "admin_qr":
+      return "/kiosk"
     case "active_employee":
       return "/me"
     case "inactive_employee":

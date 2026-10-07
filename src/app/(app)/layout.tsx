@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import { Suspense } from "react"
 
 import { AppSidebar } from "@/components/shared/app-sidebar"
@@ -15,6 +16,8 @@ export const metadata: Metadata = {
 
 async function SidebarLoader() {
   const user = await requireUser()
+  // Kiosk-only accounts never see the dashboard shell.
+  if (user.role === "admin_qr") redirect("/kiosk")
   const pendingRequests = user.role === "admin" ? await countPendingRequests() : 0
   return <AppSidebar user={user} pendingRequests={pendingRequests} footer={<SignOutButton />} />
 }

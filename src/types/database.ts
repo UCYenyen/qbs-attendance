@@ -319,7 +319,7 @@ export type Database = {
       attendance_session: "check_in" | "check_out"
       attendance_status: "attend" | "excused" | "sick" | "absence"
       request_status: "pending" | "approved" | "rejected"
-      user_role: "admin" | "active_employee" | "inactive_employee"
+      user_role: "admin" | "admin_qr" | "active_employee" | "inactive_employee"
     }
     CompositeTypes: {
       [_ in never]: never

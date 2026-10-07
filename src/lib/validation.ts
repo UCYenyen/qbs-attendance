@@ -10,6 +10,7 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 
 export const userRoleSchema = z.enum([
   "admin",
+  "admin_qr",
   "active_employee",
   "inactive_employee",
 ]) satisfies z.ZodType<UserRole>

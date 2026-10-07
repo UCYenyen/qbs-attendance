@@ -69,7 +69,7 @@ No test runner is set up yet.
 
 ## Architecture (key cross-cutting decisions)
 
-- **Roles:** `profiles.role` is one of `admin`, `active_employee`, `inactive_employee`.
+- **Roles:** `profiles.role` is one of `admin` (owner), `admin_qr` (kiosk-only: can open `/kiosk` and issue QR tokens, nothing else, and is excluded from attendance stats), `active_employee`, `inactive_employee`.
   - Accounts are invite-only (`auth.admin.inviteUserByEmail`).
   - `src/proxy.ts` refreshes the session and does quick role-based redirects. The real checks are in server code (`src/lib/auth.ts`) and in RLS.
 - **Attendance rows:**
@@ -99,7 +99,7 @@ No test runner is set up yet.
 - `SUPABASE_SECRET_KEY` currently holds the legacy `service_role` JWT. The CLI only returns new `sb_secret_` keys masked, so a new key has to be copied from the dashboard.
 - Supabase free tier: custom email templates need custom SMTP. Invites use the default template, which lands on `/auth/callback` (the session arrives in the URL hash). `/auth/confirm` (token_hash) is only for when a custom template is configured.
 - `supabase/config.toml`: `[auth.email] enable_signup` toggles the whole email provider, login included, so keep it `true`. Public sign-up is turned off by `[auth] enable_signup = false`. Preview any `supabase config push` first (`echo n | supabase config push`), because local defaults can overwrite remote settings.
-- `supabase/seed.sql` only creates the admin account (bryanfernandodinata@gmail.com, default password `password123`). It is safe to run more than once, so it can also bootstrap the hosted project from the SQL Editor after `db push`. Change the password right after.
+- `supabase/seed.sql` only creates the staff accounts: admin bryanfernandodinata@gmail.com (`password123`) and admin_qr bfernando@student.ciputra.ac.id (`12345678`). It is safe to run more than once, so it can also bootstrap the hosted project from the SQL Editor after `db push`. Change the password right after.
 
 ## Supabase rules
 

@@ -20,7 +20,8 @@ export const WEEKDAY_LABELS: Record<Weekday, string> = {
 export const WEEKDAY_ORDER: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 0]
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  admin: "Admin",
+  admin: "Admin (owner)",
+  admin_qr: "Admin QR",
   active_employee: "Karyawan aktif",
   inactive_employee: "Karyawan nonaktif",
 }

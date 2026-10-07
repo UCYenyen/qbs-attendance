@@ -34,7 +34,7 @@ async function EmployeeDetail({ params, searchParams }: PageProps<"/admin/employ
   if (!UUID.test(id)) notFound()
 
   const profile = await getProfile(id)
-  if (!profile || profile.role === "admin") notFound()
+  if (!profile || profile.role === "admin" || profile.role === "admin_qr") notFound()
 
   const today = localNow(settings.timezone).date
   const range = rangeFor(parseRangeKey(rangeParam), today)
