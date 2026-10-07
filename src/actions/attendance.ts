@@ -8,7 +8,7 @@ import { assetBelongsTo } from "@/lib/cloudinary"
 import { getRecordedSessions, insertScanRecord, upsertLeave } from "@/lib/db/attendance"
 import { getApprovedSchedule, getOverrides } from "@/lib/db/schedules"
 import { getAppSettings } from "@/lib/db/settings"
-import { SCAN_PASS_COOKIE, verifyScanPass } from "@/lib/qr"
+import { SCAN_DONE_COOKIE, SCAN_DONE_TTL_SECONDS, SCAN_PASS_COOKIE, verifyScanPass } from "@/lib/qr"
 import { localNow, resolveOpenSession, shiftDate } from "@/lib/time"
 import { fieldErrors, leaveSchema, recordScanSchema } from "@/lib/validation"
 import type { ActionResult } from "@/types/actions"
@@ -69,8 +69,15 @@ export async function recordScanAction(
   if (result === "duplicate") {
     return { ok: false, error: "Anda sudah absen untuk sesi ini." }
   }
-  // No refresh(): re-rendering /scan without the (now deleted) scan pass would replace the
-  // success screen with the "scan the kiosk" notice. /me fetches fresh data on navigation.
+  // Changing cookies makes Next re-render /scan. Without the pass it would show the "scan the
+  // kiosk" notice, so leave a short-lived marker that tells the page to show the success screen.
+  cookieStore.set(SCAN_DONE_COOKIE, `${open.session}:${open.isLate ? 1 : 0}`, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/scan",
+    maxAge: SCAN_DONE_TTL_SECONDS,
+  })
   return {
     ok: true,
     data: { session: open.session, isLate: open.isLate },

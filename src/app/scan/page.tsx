@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Suspense } from "react"
 
 import { ScanFlow } from "@/components/features/scan/scan-flow"
+import { ScanSuccess } from "@/components/features/scan/scan-success"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +13,7 @@ import { requireRole } from "@/lib/auth"
 import { getRecordedSessions } from "@/lib/db/attendance"
 import { getApprovedSchedule, getOverrides } from "@/lib/db/schedules"
 import { getAppSettings } from "@/lib/db/settings"
-import { SCAN_PASS_COOKIE, verifyScanPass } from "@/lib/qr"
+import { SCAN_DONE_COOKIE, SCAN_PASS_COOKIE, verifyScanPass } from "@/lib/qr"
 import { formatInTz, localNow, resolveOpenSession, shiftDate } from "@/lib/time"
 
 export const metadata: Metadata = {
@@ -49,6 +50,8 @@ async function ScanContent({ searchParams }: { searchParams: PageProps<"/scan">[
   const user = await requireRole(["active_employee"], "/scan")
   const cookieStore = await cookies()
   if (!verifyScanPass(cookieStore.get(SCAN_PASS_COOKIE)?.value)) {
+    const done = cookieStore.get(SCAN_DONE_COOKIE)?.value
+    if (done) return <ScanSuccess session={done.startsWith("check_out") ? "check_out" : "check_in"} isLate={done.endsWith(":1")} />
     return <Notice title="Scan QR di kiosk" description="Untuk absen, scan kode QR yang tampil di layar kiosk kantor." />
   }
 
