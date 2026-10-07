@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import type { LeaveInput, ProofResourceType } from "@/types/attendance"
 import type { PushSubscriptionInput } from "@/types/push"
-import type { ReviewScheduleInput, ScheduleDay, Weekday } from "@/types/schedule"
+import type { CreateSwapInput, ReviewScheduleInput, ReviewSwapInput, ScheduleDay, Weekday } from "@/types/schedule"
 import type {
   ChangePasswordInput,
   CreateEmployeeInput,
@@ -146,3 +146,17 @@ export function fieldErrors(error: z.ZodError): Record<string, string[]> {
   }
   return result
 }
+
+const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Tanggal tidak valid")
+
+export const createSwapSchema = z.object({
+  partnerId: z.uuid("Pilih rekan kerja"),
+  workDate: isoDateSchema,
+  note: z.string().trim().max(500).nullable(),
+}) satisfies z.ZodType<CreateSwapInput>
+
+export const reviewSwapSchema = z.object({
+  swapId: z.uuid(),
+  approve: z.boolean(),
+  note: z.string().trim().max(500).nullable(),
+}) satisfies z.ZodType<ReviewSwapInput>

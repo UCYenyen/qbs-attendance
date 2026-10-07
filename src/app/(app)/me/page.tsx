@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { requireRole } from "@/lib/auth"
 import { getRecordedSessions, getTodayStatus } from "@/lib/db/attendance"
-import { getApprovedSchedule, getMyScheduleState } from "@/lib/db/schedules"
+import { getApprovedSchedule, getMyScheduleState, getOverrides } from "@/lib/db/schedules"
 import { getAppSettings } from "@/lib/db/settings"
-import { formatInTz, localNow, resolveOpenSession, shiftDate } from "@/lib/time"
+import { formatInTz, localNow, resolveOpenSession, shiftDate, shiftOn } from "@/lib/time"
 
 export const metadata: Metadata = {
   title: "Hari ini",
@@ -48,16 +48,24 @@ async function TodayContent() {
     )
   }
 
-  const [status, recorded] = await Promise.all([
+  const dates = [now.date, shiftDate(now.date, -1)]
+  const [status, recorded, overrides] = await Promise.all([
     getTodayStatus(user.id, now.date),
-    getRecordedSessions(user.id, [now.date, shiftDate(now.date, -1)]),
+    getRecordedSessions(user.id, dates),
+    getOverrides(user.id, dates),
   ])
-  const scheduleToday = schedule.find((day) => day.weekday === now.weekday) ?? null
-  const open = resolveOpenSession(schedule, settings, recorded)
+  const scheduleToday = shiftOn(schedule, overrides, now.date)
+  const isSwappedToday = overrides.some((o) => o.workDate === now.date)
+  const open = resolveOpenSession(schedule, settings, recorded, overrides)
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <TodayStatusCard status={status} scheduleToday={scheduleToday} timezone={settings.timezone} />
+      <TodayStatusCard
+        status={status}
+        scheduleToday={scheduleToday}
+        isSwapped={isSwappedToday}
+        timezone={settings.timezone}
+      />
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

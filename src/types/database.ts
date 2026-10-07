@@ -212,6 +212,96 @@ export type Database = {
           },
         ]
       }
+      schedule_overrides: {
+        Row: {
+          created_at: string
+          end_time: string
+          is_working_day: boolean
+          start_time: string
+          swap_id: string | null
+          user_id: string
+          work_date: string
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string
+          is_working_day: boolean
+          start_time?: string
+          swap_id?: string | null
+          user_id: string
+          work_date: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          is_working_day?: boolean
+          start_time?: string
+          swap_id?: string | null
+          user_id?: string
+          work_date?: string
+        }
+        Relationships: []
+      }
+      schedule_swaps: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          partner_id: string
+          partner_shift: Json | null
+          requester_id: string
+          requester_shift: Json | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["request_status"]
+          work_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          partner_id: string
+          partner_shift?: Json | null
+          requester_id?: string
+          requester_shift?: Json | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["request_status"]
+          work_date: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          partner_id?: string
+          partner_shift?: Json | null
+          requester_id?: string
+          requester_shift?: Json | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["request_status"]
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_swaps_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_swaps_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schedules: {
         Row: {
           approved_at: string
@@ -305,6 +395,10 @@ export type Database = {
       }
       review_schedule_request: {
         Args: { p_approve: boolean; p_note?: string | null; p_request_id: string }
+        Returns: undefined
+      }
+      review_schedule_swap: {
+        Args: { p_approve: boolean; p_note?: string | null; p_swap_id: string }
         Returns: undefined
       }
       today_summary: {

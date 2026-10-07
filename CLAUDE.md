@@ -84,6 +84,9 @@ No test runner is set up yet.
   - The `mark_absences()` cron job inserts an `absence` row for any session left empty when its window closes.
   - Timezone is `Asia/Jakarta`. pg_cron schedules are in **UTC**.
 - **Schedule lock:** a partial unique index on `schedule_requests(user_id) where status = 'pending'` is what stops an employee from editing again before the admin reviews it. Approve and reject are SQL RPCs.
+- **One-day schedule swaps:** `schedule_swaps` holds requests (pending until an admin approves via `review_schedule_swap`). Approval writes one `schedule_overrides` row per employee for that date, and the weekly `schedules` stay unchanged.
+  - Anything that needs "the shift on date X" must respect overrides: `private.effective_shifts(date)` in SQL (used by `mark_absences` and `today_summary`), and `shiftOn` / `resolveOpenSession(..., overrides)` in TS.
+  - A trigger validates each request (active partner, date not past, no attendance yet, one pending per day, shifts differ) and calls `notify-admins` with type `schedule_swap`.
 - **Stats:** the SQL functions `attendance_series(granularity, from, to, user_id?)`, `employee_summary` and `today_summary` drive every chart and summary card. Do the aggregation in Postgres, not in JS.
 - **Notifications:** `push_subscriptions` stores browser subscriptions, and the service worker is `public/sw.js`.
   - A pg_net trigger and pg_cron jobs call the Supabase edge functions `notify-admins` and `daily-attendance-summary`, which send web pushes with VAPID keys.

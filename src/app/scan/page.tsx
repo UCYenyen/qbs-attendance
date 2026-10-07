@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton"
 import { requireRole } from "@/lib/auth"
 import { getRecordedSessions } from "@/lib/db/attendance"
-import { getApprovedSchedule } from "@/lib/db/schedules"
+import { getApprovedSchedule, getOverrides } from "@/lib/db/schedules"
 import { getAppSettings } from "@/lib/db/settings"
 import { SCAN_PASS_COOKIE, verifyScanPass } from "@/lib/qr"
 import { formatInTz, localNow, resolveOpenSession, shiftDate } from "@/lib/time"
@@ -58,8 +58,12 @@ async function ScanContent({ searchParams }: { searchParams: PageProps<"/scan">[
   }
 
   const today = localNow(settings.timezone).date
-  const recorded = await getRecordedSessions(user.id, [today, shiftDate(today, -1)])
-  const open = resolveOpenSession(schedule, settings, recorded)
+  const dates = [today, shiftDate(today, -1)]
+  const [recorded, overrides] = await Promise.all([
+    getRecordedSessions(user.id, dates),
+    getOverrides(user.id, dates),
+  ])
+  const open = resolveOpenSession(schedule, settings, recorded, overrides)
 
   if (open.kind === "not_working_day") {
     return <Notice title="Hari ini libur" description="Anda tidak dijadwalkan bekerja hari ini." />

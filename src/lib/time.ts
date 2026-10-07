@@ -3,7 +3,7 @@ import { addDays, addMinutes, format, parseISO, subMinutes } from "date-fns"
 import { id } from "date-fns/locale"
 
 import type { AppSettings, AttendanceSession, OpenSessionResult } from "@/types/attendance"
-import type { ScheduleDay, Weekday } from "@/types/schedule"
+import type { ScheduleDay, ScheduleOverride, Shift, Weekday } from "@/types/schedule"
 
 export const DEFAULT_TIMEZONE = "Asia/Jakarta"
 
@@ -52,31 +52,44 @@ export function formatInTz(iso: string | Date, timezone: string, pattern: string
 
 const SESSIONS: AttendanceSession[] = ["check_in", "check_out"]
 
+/** The shift on a date: an approved swap override wins over the weekly schedule. */
+export function shiftOn(
+  schedule: readonly ScheduleDay[],
+  overrides: readonly ScheduleOverride[],
+  workDate: string,
+): Shift {
+  const override = overrides.find((o) => o.workDate === workDate)
+  if (override) return override
+  const day = schedule.find((d) => d.weekday === weekdayOf(workDate))
+  return day?.isWorkingDay
+    ? { isWorkingDay: true, startTime: day.startTime, endTime: day.endTime }
+    : { isWorkingDay: false, startTime: null, endTime: null }
+}
+
 /**
  * Decides which session (if any) a scan right now would record.
  * Looks at yesterday too, so check-out windows that run past midnight still work.
- * `recorded` holds keys of `${workDate}:${session}` that already have a row.
+ * `recorded` holds keys of `${workDate}:${session}` that already have a row;
+ * `overrides` are approved one-day swaps for today/yesterday.
  */
 export function resolveOpenSession(
-  schedule: ScheduleDay[],
+  schedule: readonly ScheduleDay[],
   settings: AppSettings,
   recorded: ReadonlySet<string>,
+  overrides: readonly ScheduleOverride[] = [],
   now: Date = new Date(),
 ): OpenSessionResult {
   const today = localNow(settings.timezone, now).date
 
   for (const workDate of [today, shiftDate(today, -1)]) {
-    const day = schedule.find((d) => d.weekday === weekdayOf(workDate))
-    if (!day?.isWorkingDay) continue
+    const day = shiftOn(schedule, overrides, workDate)
+    if (!day.isWorkingDay || !day.startTime || !day.endTime) continue
 
     for (const session of SESSIONS) {
       if (recorded.has(`${workDate}:${session}`)) continue
 
-      const expected = zonedInstant(
-        workDate,
-        session === "check_in" ? day.startTime : day.endTime,
-        settings.timezone,
-      )
+      const time: string = session === "check_in" ? day.startTime : day.endTime
+      const expected = zonedInstant(workDate, time, settings.timezone)
       const opensAt = subMinutes(expected, settings.windowBeforeMin)
       const closesAt = addMinutes(expected, settings.windowAfterMin)
 
@@ -93,19 +106,13 @@ export function resolveOpenSession(
     }
   }
 
-  const todaySchedule = schedule.find((d) => d.weekday === weekdayOf(today))
-  if (!todaySchedule?.isWorkingDay) return { kind: "not_working_day", workDate: today }
+  const todayShift = shiftOn(schedule, overrides, today)
+  const { startTime, endTime } = todayShift
+  if (!todayShift.isWorkingDay || !startTime || !endTime) return { kind: "not_working_day", workDate: today }
 
-  const upcoming = SESSIONS.map((session) =>
-    subMinutes(
-      zonedInstant(
-        today,
-        session === "check_in" ? todaySchedule.startTime : todaySchedule.endTime,
-        settings.timezone,
-      ),
-      settings.windowBeforeMin,
-    ),
-  ).find((opensAt) => opensAt > now)
+  const upcoming = [startTime, endTime]
+    .map((time) => subMinutes(zonedInstant(today, time, settings.timezone), settings.windowBeforeMin))
+    .find((opensAt) => opensAt > now)
 
   return {
     kind: "no_open_window",

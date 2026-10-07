@@ -6,7 +6,7 @@ import { refresh } from "next/cache"
 import { authorize } from "@/lib/auth"
 import { assetBelongsTo } from "@/lib/cloudinary"
 import { getRecordedSessions, insertScanRecord, upsertLeave } from "@/lib/db/attendance"
-import { getApprovedSchedule } from "@/lib/db/schedules"
+import { getApprovedSchedule, getOverrides } from "@/lib/db/schedules"
 import { getAppSettings } from "@/lib/db/settings"
 import { SCAN_PASS_COOKIE, verifyScanPass } from "@/lib/qr"
 import { localNow, resolveOpenSession, shiftDate } from "@/lib/time"
@@ -41,8 +41,12 @@ export async function recordScanAction(
   if (!schedule) return { ok: false, error: "Jadwal Anda belum disetujui admin." }
 
   const today = localNow(settings.timezone).date
-  const recorded = await getRecordedSessions(user.id, [today, shiftDate(today, -1)])
-  const open = resolveOpenSession(schedule, settings, recorded)
+  const dates = [today, shiftDate(today, -1)]
+  const [recorded, overrides] = await Promise.all([
+    getRecordedSessions(user.id, dates),
+    getOverrides(user.id, dates),
+  ])
+  const open = resolveOpenSession(schedule, settings, recorded, overrides)
   if (open.kind !== "open") {
     return {
       ok: false,

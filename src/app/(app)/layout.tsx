@@ -9,7 +9,7 @@ import { SignOutButton } from "@/components/shared/sign-out-button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { requireUser } from "@/lib/auth"
-import { countPendingRequests } from "@/lib/db/schedules"
+import { countPendingRequests, countPendingSwaps } from "@/lib/db/schedules"
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -19,7 +19,8 @@ async function SidebarLoader() {
   const user = await requireUser()
   // Kiosk-only accounts never see the dashboard shell.
   if (user.role === "admin_qr") redirect("/kiosk")
-  const pendingRequests = user.role === "admin" ? await countPendingRequests() : 0
+  const pendingRequests =
+    user.role === "admin" ? (await Promise.all([countPendingRequests(), countPendingSwaps()])).reduce((a, b) => a + b, 0) : 0
   return <AppSidebar user={user} pendingRequests={pendingRequests} footer={<SignOutButton />} />
 }
 

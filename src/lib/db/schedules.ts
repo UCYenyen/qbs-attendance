@@ -8,6 +8,7 @@ import type {
   MyScheduleState,
   ReviewScheduleInput,
   ScheduleItemJson,
+  ScheduleOverride,
   ScheduleRequest,
   ScheduleRequestRow,
   ScheduleRequestWithEmployee,
@@ -163,4 +164,31 @@ export async function reviewScheduleRequest(input: ReviewScheduleInput): Promise
     p_note: input.note,
   })
   if (error) throw new Error(error.message)
+}
+
+/** Approved one-day swaps for a user on the given dates. */
+export async function getOverrides(userId: string, dates: string[]): Promise<ScheduleOverride[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("schedule_overrides")
+    .select("work_date, is_working_day, start_time, end_time")
+    .eq("user_id", userId)
+    .in("work_date", dates)
+  if (error) throw new Error(error.message)
+  return data.map((row) => ({
+    workDate: row.work_date,
+    isWorkingDay: row.is_working_day,
+    startTime: row.is_working_day ? toHourMinute(row.start_time) : null,
+    endTime: row.is_working_day ? toHourMinute(row.end_time) : null,
+  }))
+}
+
+export async function countPendingSwaps(): Promise<number> {
+  const supabase = await createClient()
+  const { count, error } = await supabase
+    .from("schedule_swaps")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "pending")
+  if (error) throw new Error(error.message)
+  return count ?? 0
 }

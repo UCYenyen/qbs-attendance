@@ -7,11 +7,13 @@ import { Separator } from "@/components/ui/separator"
 import { formatWorkDate } from "@/lib/format"
 import { formatInTz } from "@/lib/time"
 import type { AttendanceRecord, TodayStatus } from "@/types/attendance"
-import type { ScheduleDay } from "@/types/schedule"
+import type { Shift } from "@/types/schedule"
 
 interface TodayStatusCardProps {
   status: TodayStatus
-  scheduleToday: ScheduleDay | null
+  scheduleToday: Shift
+  /** True when an approved one-day swap replaced today's weekly schedule. */
+  isSwapped: boolean
   timezone: string
 }
 
@@ -58,8 +60,8 @@ function SessionRow({
   )
 }
 
-export function TodayStatusCard({ status, scheduleToday, timezone }: TodayStatusCardProps) {
-  const working = scheduleToday?.isWorkingDay ?? false
+export function TodayStatusCard({ status, scheduleToday, isSwapped, timezone }: TodayStatusCardProps) {
+  const working = scheduleToday.isWorkingDay
 
   return (
     <Card>
@@ -68,12 +70,15 @@ export function TodayStatusCard({ status, scheduleToday, timezone }: TodayStatus
           <ClockIcon aria-hidden className="text-primary" />
           Status hari ini
         </CardTitle>
-        <CardDescription>{formatWorkDate(status.workDate)}</CardDescription>
+        <CardDescription className="flex flex-wrap items-center gap-2">
+          {formatWorkDate(status.workDate)}
+          {isSwapped ? <Badge variant="secondary">Jadwal ditukar</Badge> : null}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <SessionRow
           label="Absen masuk"
-          expected={working ? (scheduleToday?.startTime ?? null) : null}
+          expected={working ? scheduleToday.startTime : null}
           record={status.checkIn}
           timezone={timezone}
           icon={LogInIcon}
@@ -81,7 +86,7 @@ export function TodayStatusCard({ status, scheduleToday, timezone }: TodayStatus
         <Separator />
         <SessionRow
           label="Absen pulang"
-          expected={working ? (scheduleToday?.endTime ?? null) : null}
+          expected={working ? scheduleToday.endTime : null}
           record={status.checkOut}
           timezone={timezone}
           icon={LogOutIcon}

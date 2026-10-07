@@ -53,3 +53,58 @@ export interface ReviewScheduleInput {
   approve: boolean
   note: string | null
 }
+
+/** A shift on one specific date (times "HH:mm"; ignored when not a working day). */
+export interface Shift {
+  isWorkingDay: boolean
+  startTime: string | null
+  endTime: string | null
+}
+
+/** Date-specific replacement of the weekly schedule (written when a swap is approved). */
+export interface ScheduleOverride extends Shift {
+  workDate: string
+}
+
+export interface SwapParty {
+  id: string
+  fullName: string
+  contact: string
+}
+
+export interface ScheduleSwap {
+  id: string
+  workDate: string
+  status: RequestStatus
+  note: string | null
+  reviewNote: string | null
+  requester: SwapParty
+  partner: SwapParty
+  requesterShift: Shift
+  partnerShift: Shift
+  createdAt: string
+}
+
+export interface SwapPartner {
+  id: string
+  fullName: string
+  username: string | null
+}
+
+export interface SwapPreview {
+  workDate: string
+  mine: Shift
+  partner: Shift
+}
+
+export interface CreateSwapInput {
+  partnerId: string
+  workDate: string
+  note: string | null
+}
+
+export interface ReviewSwapInput {
+  swapId: string
+  approve: boolean
+  note: string | null
+}

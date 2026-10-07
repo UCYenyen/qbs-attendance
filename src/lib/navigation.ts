@@ -1,4 +1,5 @@
 import {
+  ArrowLeftRightIcon,
   CalendarCheckIcon,
   CalendarClockIcon,
   ClipboardListIcon,
@@ -27,6 +28,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
 export const EMPLOYEE_NAV: readonly NavItem[] = [
   { title: "Hari ini", href: "/me", icon: HomeIcon },
   { title: "Jadwal saya", href: "/me/schedule", icon: CalendarClockIcon },
+  { title: "Tukar jadwal", href: "/me/swap", icon: ArrowLeftRightIcon },
   { title: "Sakit / izin", href: "/me/leave", icon: StethoscopeIcon },
   { title: "Riwayat", href: "/me/history", icon: HistoryIcon },
   { title: "Akun saya", href: "/account", icon: UserCogIcon },

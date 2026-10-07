@@ -3,7 +3,7 @@ import { id } from "date-fns/locale"
 
 
 import type { AttendanceStatus } from "@/types/attendance"
-import type { RequestStatus, Weekday } from "@/types/schedule"
+import type { RequestStatus, Shift, Weekday } from "@/types/schedule"
 import type { UserRole } from "@/types/user"
 
 export const WEEKDAY_LABELS: Record<Weekday, string> = {
@@ -58,4 +58,8 @@ export function initials(name: string): string {
 /** "Senin, 7 Okt 2026" style date for a yyyy-MM-dd calendar date. */
 export function formatWorkDate(workDate: string, pattern = "EEEE, d MMM yyyy"): string {
   return format(parseISO(workDate), pattern, { locale: id })
+}
+
+export function formatShift(shift: Shift): string {
+  return shift.isWorkingDay && shift.startTime && shift.endTime ? `${shift.startTime}–${shift.endTime}` : "Libur"
 }
