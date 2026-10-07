@@ -28,6 +28,7 @@ export interface EmployeeSummary {
   userId: string
   fullName: string
   email: string
+  username: string | null
   role: UserRole
   scheduled: number
   attended: number

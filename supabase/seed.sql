@@ -1,6 +1,8 @@
 -- Seed: staff accounts only. Safe to run more than once.
---   admin (owner)  bryanfernandodinata@gmail.com    password123  (change after first login at /auth/set-password)
---   admin_qr       bfernando@student.ciputra.ac.id  12345678     (can only open the kiosk QR screen)
+--   role            username  email                            password
+--   admin (owner)   admin     bryanfernandodinata@gmail.com    password123  (change it at /account)
+--   admin_qr        adminqr   bfernando@student.ciputra.ac.id  12345678     (kiosk QR screen only)
+-- Login works with either the username or the email.
 
 do $$
 declare
@@ -9,9 +11,9 @@ declare
 begin
   for u in
     select * from (values
-      ('00000000-0000-4000-a000-000000000001'::uuid, 'bryanfernandodinata@gmail.com', 'Bryan Fernando Dinata', 'password123', 'admin'::public.user_role),
-      ('00000000-0000-4000-a000-000000000002'::uuid, 'bfernando@student.ciputra.ac.id', 'Admin QR', '12345678', 'admin_qr'::public.user_role)
-    ) as t(id, email, full_name, password, role)
+      ('00000000-0000-4000-a000-000000000001'::uuid, 'bryanfernandodinata@gmail.com', 'admin', 'Bryan Fernando Dinata', 'password123', 'admin'::public.user_role),
+      ('00000000-0000-4000-a000-000000000002'::uuid, 'bfernando@student.ciputra.ac.id', 'adminqr', 'Admin QR', '12345678', 'admin_qr'::public.user_role)
+    ) as t(id, email, username, full_name, password, role)
   loop
     select id into v_id from auth.users where email = u.email;
 
@@ -39,6 +41,6 @@ begin
     end if;
 
     -- The on_auth_user_created trigger creates the profile as inactive_employee; set the real role.
-    update public.profiles set role = u.role, full_name = u.full_name where id = v_id;
+    update public.profiles set role = u.role, full_name = u.full_name, username = u.username where id = v_id;
   end loop;
 end $$;

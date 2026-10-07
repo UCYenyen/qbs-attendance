@@ -7,6 +7,7 @@ import {
   LayoutDashboardIcon,
   QrCodeIcon,
   SettingsIcon,
+  UserCogIcon,
   StethoscopeIcon,
   UsersIcon,
 } from "lucide-react"
@@ -20,6 +21,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { title: "Pengajuan jadwal", href: "/admin/schedule-requests", icon: ClipboardListIcon },
   { title: "QR Kiosk", href: "/kiosk", icon: QrCodeIcon },
   { title: "Pengaturan", href: "/admin/settings", icon: SettingsIcon },
+  { title: "Akun saya", href: "/account", icon: UserCogIcon },
 ]
 
 export const EMPLOYEE_NAV: readonly NavItem[] = [
@@ -27,6 +29,7 @@ export const EMPLOYEE_NAV: readonly NavItem[] = [
   { title: "Jadwal saya", href: "/me/schedule", icon: CalendarClockIcon },
   { title: "Sakit / izin", href: "/me/leave", icon: StethoscopeIcon },
   { title: "Riwayat", href: "/me/history", icon: HistoryIcon },
+  { title: "Akun saya", href: "/account", icon: UserCogIcon },
 ]
 
 export const SCAN_NAV_ITEM: NavItem = { title: "Scan", href: "/scan", icon: CalendarCheckIcon }

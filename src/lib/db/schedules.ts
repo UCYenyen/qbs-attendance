@@ -1,5 +1,6 @@
 import "server-only"
 
+import { contactLabel } from "@/lib/accounts"
 import { createClient } from "@/lib/supabase/server"
 import { toHourMinute } from "@/lib/time"
 import type { Json } from "@/types/database"
@@ -122,7 +123,7 @@ export async function listPendingRequests(): Promise<ScheduleRequestWithEmployee
   const supabase = await createClient()
   const { data, error } = await supabase
     .from("schedule_requests")
-    .select("*, employee:profiles!schedule_requests_user_id_fkey(id, full_name, email)")
+    .select("*, employee:profiles!schedule_requests_user_id_fkey(id, full_name, email, username)")
     .eq("status", "pending")
     .order("created_at", { ascending: true })
   if (error) throw new Error(error.message)
@@ -137,8 +138,8 @@ export async function listPendingRequests(): Promise<ScheduleRequestWithEmployee
     ...toRequest(row),
     employee: {
       id: row.employee?.id ?? row.user_id,
-      fullName: row.employee?.full_name || row.employee?.email || "Tanpa nama",
-      email: row.employee?.email ?? "",
+      fullName: row.employee?.full_name || row.employee?.username || "Tanpa nama",
+      contact: contactLabel(row.employee?.username ?? null, row.employee?.email ?? null),
     },
     currentSchedule: fromRows(scheduleRows.filter((s) => s.user_id === row.user_id)),
   }))

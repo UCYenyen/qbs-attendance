@@ -3,7 +3,13 @@ import { z } from "zod"
 import type { LeaveInput, ProofResourceType } from "@/types/attendance"
 import type { PushSubscriptionInput } from "@/types/push"
 import type { ReviewScheduleInput, ScheduleDay, Weekday } from "@/types/schedule"
-import type { InviteEmployeeInput, UpdateRoleInput, UserRole } from "@/types/user"
+import type {
+  ChangePasswordInput,
+  CreateEmployeeInput,
+  ResetPasswordInput,
+  UpdateRoleInput,
+  UserRole,
+} from "@/types/user"
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
@@ -16,9 +22,17 @@ export const userRoleSchema = z.enum([
 ]) satisfies z.ZodType<UserRole>
 
 export const loginSchema = z.object({
-  email: z.email("Masukkan alamat email yang valid"),
+  identifier: z.string().trim().min(1, "Masukkan email atau username"),
   password: z.string().min(1, "Masukkan kata sandi"),
 })
+
+const passwordSchema = z.string().min(8, "Minimal 8 karakter").max(72, "Maksimal 72 karakter")
+
+export const usernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(/^[a-z0-9._]{3,30}$/, "3–30 karakter: huruf kecil, angka, titik atau garis bawah")
 
 export const setPasswordSchema = z
   .object({
@@ -30,10 +44,32 @@ export const setPasswordSchema = z
     message: "Kata sandi tidak sama",
   })
 
-export const inviteEmployeeSchema = z.object({
-  email: z.email("Masukkan alamat email yang valid"),
+export const createEmployeeSchema = z.object({
   fullName: z.string().trim().min(2, "Masukkan nama karyawan").max(120),
-}) satisfies z.ZodType<InviteEmployeeInput>
+  username: usernameSchema,
+  password: passwordSchema,
+  email: z.email("Masukkan alamat email yang valid").toLowerCase().nullable(),
+}) satisfies z.ZodType<CreateEmployeeInput>
+
+export const resetPasswordSchema = z.object({
+  userId: z.uuid(),
+  password: passwordSchema,
+}) satisfies z.ZodType<ResetPasswordInput>
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Masukkan kata sandi saat ini"),
+    password: passwordSchema,
+    confirm: z.string(),
+  })
+  .refine((value) => value.password === value.confirm, {
+    path: ["confirm"],
+    message: "Kata sandi tidak sama",
+  })
+  .refine((value) => value.password !== value.currentPassword, {
+    path: ["password"],
+    message: "Gunakan kata sandi yang berbeda dari sebelumnya",
+  }) satisfies z.ZodType<ChangePasswordInput>
 
 export const updateRoleSchema = z.object({
   userId: z.uuid(),

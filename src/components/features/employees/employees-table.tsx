@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { RoleSelect } from "@/components/features/employees/role-select"
+import { contactLabel } from "@/lib/accounts"
 import { Badge } from "@/components/ui/badge"
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -13,7 +14,7 @@ export function EmployeesTable({ employees }: { employees: EmployeeSummary[] }) 
       <Empty className="border">
         <EmptyHeader>
           <EmptyTitle>Belum ada karyawan</EmptyTitle>
-          <EmptyDescription>Undang karyawan pertama untuk mulai.</EmptyDescription>
+          <EmptyDescription>Tambahkan karyawan pertama untuk mulai.</EmptyDescription>
         </EmptyHeader>
       </Empty>
     )
@@ -41,7 +42,9 @@ export function EmployeesTable({ employees }: { employees: EmployeeSummary[] }) 
                   className="flex flex-col font-medium underline-offset-4 hover:underline"
                 >
                   {employee.fullName}
-                  <span className="text-sm font-normal text-muted-foreground">{employee.email}</span>
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {contactLabel(employee.username, employee.email)}
+                  </span>
                 </Link>
               </TableCell>
               <TableCell>

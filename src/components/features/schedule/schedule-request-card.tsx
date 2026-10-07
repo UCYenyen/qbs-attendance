@@ -34,7 +34,7 @@ export function ScheduleRequestCard({ request, submittedLabel }: ScheduleRequest
       <CardHeader>
         <CardTitle>{request.employee.fullName}</CardTitle>
         <CardDescription>
-          {request.employee.email} · diajukan {submittedLabel}
+          {request.employee.contact} · diajukan {submittedLabel}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6 md:grid-cols-2">

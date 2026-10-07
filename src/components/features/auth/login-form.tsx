@@ -17,7 +17,7 @@ function errorsFor(state: ActionResult | null, field: string) {
 
 export function LoginForm({ next }: { next: string }) {
   const [state, formAction, isPending] = useActionState<ActionResult | null, FormData>(signInAction, null)
-  const emailErrors = errorsFor(state, "email")
+  const identifierErrors = errorsFor(state, "identifier")
   const passwordErrors = errorsFor(state, "password")
 
   return (
@@ -29,18 +29,20 @@ export function LoginForm({ next }: { next: string }) {
             <AlertDescription>{state.error}</AlertDescription>
           </Alert>
         ) : null}
-        <Field data-invalid={emailErrors ? true : undefined}>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+        <Field data-invalid={identifierErrors ? true : undefined}>
+          <FieldLabel htmlFor="identifier">Email atau username</FieldLabel>
           <Input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
+            id="identifier"
+            name="identifier"
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             required
-            aria-invalid={emailErrors ? true : undefined}
+            aria-invalid={identifierErrors ? true : undefined}
           />
-          <FieldError errors={emailErrors} />
+          <FieldError errors={identifierErrors} />
         </Field>
         <Field data-invalid={passwordErrors ? true : undefined}>
           <FieldLabel htmlFor="password">Kata sandi</FieldLabel>

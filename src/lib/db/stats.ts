@@ -48,8 +48,9 @@ export async function getEmployeeSummaries(from: string, to: string): Promise<Em
 
   return data.map((row) => ({
     userId: row.user_id,
-    fullName: row.full_name || row.email,
+    fullName: row.full_name || row.username || row.email,
     email: row.email,
+    username: row.username,
     role: row.role,
     scheduled: row.scheduled,
     attended: row.attended,

@@ -4,6 +4,7 @@ import { Suspense } from "react"
 
 import { AppSidebar } from "@/components/shared/app-sidebar"
 import { AppSidebarSkeleton } from "@/components/shared/app-sidebar-skeleton"
+import { PasswordReminder } from "@/components/shared/password-reminder"
 import { SignOutButton } from "@/components/shared/sign-out-button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
@@ -35,6 +36,9 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
           <span className="font-medium">QBS Presence</span>
         </header>
         <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+          <Suspense fallback={null}>
+            <PasswordReminder />
+          </Suspense>
           {children}
         </div>
       </SidebarInset>

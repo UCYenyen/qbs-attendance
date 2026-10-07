@@ -5,6 +5,7 @@ import { Suspense } from "react"
 import { AttendanceLogTable } from "@/components/features/attendance/attendance-log-table"
 import { RangeToggle } from "@/components/features/dashboard/range-toggle"
 import { StatsCharts } from "@/components/features/dashboard/stats-charts"
+import { ResetPasswordDialog } from "@/components/features/employees/reset-password-dialog"
 import { ScheduleSummary } from "@/components/features/schedule/schedule-summary"
 import { PageHeader } from "@/components/shared/page-header"
 import { PageSkeleton } from "@/components/shared/page-skeleton"
@@ -18,6 +19,7 @@ import { getApprovedSchedule } from "@/lib/db/schedules"
 import { getAppSettings } from "@/lib/db/settings"
 import { getAttendanceSeries, seriesTotals } from "@/lib/db/stats"
 import { parseRangeKey, rangeFor } from "@/lib/date-range"
+import { contactLabel } from "@/lib/accounts"
 import { ROLE_LABELS } from "@/lib/format"
 import { localNow, shiftDate } from "@/lib/time"
 
@@ -47,11 +49,12 @@ async function EmployeeDetail({ params, searchParams }: PageProps<"/admin/employ
   return (
     <>
       <PageHeader
-        title={profile.full_name || profile.email}
-        description={profile.email}
+        title={profile.full_name || profile.username || profile.email}
+        description={contactLabel(profile.username, profile.email)}
         actions={
           <>
             <Badge variant="secondary">{ROLE_LABELS[profile.role]}</Badge>
+            <ResetPasswordDialog userId={profile.id} name={profile.full_name || profile.username || "karyawan ini"} />
             <Suspense fallback={<Skeleton className="h-9 w-72" />}>
               <RangeToggle />
             </Suspense>

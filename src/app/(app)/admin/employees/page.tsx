@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { EmployeesTable } from "@/components/features/employees/employees-table"
-import { InviteDialog } from "@/components/features/employees/invite-dialog"
+import { AddEmployeeDialog } from "@/components/features/employees/add-employee-dialog"
 import { PageHeader } from "@/components/shared/page-header"
 import { Skeleton } from "@/components/ui/skeleton"
 import { requireRole } from "@/lib/auth"
@@ -29,7 +29,7 @@ export default function EmployeesPage() {
       <PageHeader
         title="Karyawan"
         description="Statistik 30 hari terakhir. Klik nama untuk melihat jadwal dan grafik per karyawan."
-        actions={<InviteDialog />}
+        actions={<AddEmployeeDialog />}
       />
       <Suspense fallback={<Skeleton className="h-96 rounded-xl" />}>
         <EmployeesContent />

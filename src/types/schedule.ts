@@ -37,7 +37,7 @@ export interface ScheduleRequest {
 }
 
 export interface ScheduleRequestWithEmployee extends ScheduleRequest {
-  employee: { id: string; fullName: string; email: string }
+  employee: { id: string; fullName: string; contact: string }
   currentSchedule: WeeklySchedule | null
 }
 

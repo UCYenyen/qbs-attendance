@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 
 import { updateSession } from "@/lib/supabase/proxy"
 
-const PROTECTED_PREFIXES = ["/admin", "/me", "/kiosk", "/inactive", "/auth/set-password"]
+const PROTECTED_PREFIXES = ["/admin", "/me", "/account", "/kiosk", "/inactive", "/auth/set-password"]
 
 function isProtected(pathname: string): boolean {
   if (pathname === "/scan") return true // /scan/start stays public: it sets the scan pass first

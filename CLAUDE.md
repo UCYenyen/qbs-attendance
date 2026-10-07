@@ -70,7 +70,8 @@ No test runner is set up yet.
 ## Architecture (key cross-cutting decisions)
 
 - **Roles:** `profiles.role` is one of `admin` (owner), `admin_qr` (kiosk-only: can open `/kiosk` and issue QR tokens, nothing else, and is excluded from attendance stats), `active_employee`, `inactive_employee`.
-  - Accounts are invite-only (`auth.admin.inviteUserByEmail`).
+  - Public sign-up is off. The owner creates accounts (`auth.admin.createUser`) with a username, a default password and an optional email. Accounts without an email get a placeholder `username@karyawan.qbs-presence.test` (see `lib/accounts.ts`).
+  - Login accepts the username or the email (`resolveLoginEmail`). `profiles.must_change_password` sends users to `/account` until they change the default password. The owner can reset an employee's password from the employee detail page.
   - `src/proxy.ts` refreshes the session and does quick role-based redirects. The real checks are in server code (`src/lib/auth.ts`) and in RLS.
 - **Attendance rows:**
   - There's one row per `(user_id, work_date, session)`, where session is `check_in` or `check_out`. `created_at` is the scan time.

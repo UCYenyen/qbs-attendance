@@ -97,8 +97,10 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          must_change_password: boolean
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -106,8 +108,10 @@ export type Database = {
           email: string
           full_name?: string
           id: string
+          must_change_password?: boolean
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -115,8 +119,10 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          must_change_password?: boolean
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -293,6 +299,7 @@ export type Database = {
           scheduled: number
           sick: number
           user_id: string
+          username: string | null
           worked_hours: number
         }[]
       }
