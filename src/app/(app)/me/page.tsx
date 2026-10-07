@@ -77,7 +77,7 @@ async function TodayContent() {
         <CardContent>
           <ol className="flex list-decimal flex-col gap-2 pl-5">
             <li>Buka kamera HP dan arahkan ke QR di layar kiosk kantor.</li>
-            <li>Ketuk link yang muncul. QR berganti setiap 1 menit.</li>
+            <li>Ketuk link yang muncul. QR berganti setiap 30 detik.</li>
             <li>Ambil selfie sebagai bukti kehadiran, lalu kirim.</li>
           </ol>
           <p className="mt-4 text-sm text-muted-foreground">

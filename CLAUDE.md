@@ -77,7 +77,7 @@ No test runner is set up yet.
   - There's one row per `(user_id, work_date, session)`, where session is `check_in` or `check_out`. `created_at` is the scan time.
   - A sick or excused day writes both rows. The `attendance_days` view joins them into one row per day, and working hours = check-out − check-in.
 - **Writing attendance:** the client is never allowed to write `attendance` directly (RLS blocks it).
-  - QR scans go through a server action. It checks the HMAC QR token (valid for the current and previous minute) and the scan window from the approved schedule, then writes using the secret-key client.
+  - QR scans go through a server action. It checks the HMAC QR token (rotates every 30 s, `lib/qr-config.ts`; valid for the current and previous window) and the scan window from the approved schedule, then writes using the secret-key client.
 - **Scan window:** set in `app_settings`.
   - The window runs from 60 minutes before to 120 minutes after the expected time.
   - A scan more than 15 minutes after the expected start is flagged `is_late`.

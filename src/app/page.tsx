@@ -9,7 +9,7 @@ import { homePathForRole } from "@/lib/navigation"
 export const metadata: Metadata = {
   title: { absolute: "QBS Presence — Absensi karyawan" },
   description:
-    "Absen masuk dan pulang dengan QR yang berganti tiap menit, ajukan jadwal mingguan, dan pantau kehadiran di QBS.",
+    "Absen masuk dan pulang dengan QR yang berganti tiap 30 detik, ajukan jadwal mingguan, dan pantau kehadiran di QBS.",
 }
 
 async function RoleRedirect(): Promise<null> {

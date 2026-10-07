@@ -12,7 +12,7 @@ import { getAppSettings } from "@/lib/db/settings"
 
 export const metadata: Metadata = {
   title: "QR Kiosk",
-  description: "Tampilkan QR absensi yang berganti setiap menit di layar kantor.",
+  description: "Tampilkan QR absensi yang berganti setiap 30 detik di layar kantor.",
   robots: { index: false, follow: false },
 }
 

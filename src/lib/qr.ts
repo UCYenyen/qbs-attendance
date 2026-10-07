@@ -3,9 +3,9 @@ import "server-only"
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto"
 
 import { serverEnv } from "@/lib/env.server"
+import { QR_ROTATION_MS } from "@/lib/qr-config"
 
-/** Each QR code is valid for its own minute plus the previous one (scan + clock drift grace). */
-export const QR_ROTATION_MS = 60_000
+/** Each QR code is valid for its own window plus the previous one (scan + clock drift grace). */
 export const SCAN_PASS_COOKIE = "qbs_scan_pass"
 export const SCAN_PASS_TTL_SECONDS = 180
 

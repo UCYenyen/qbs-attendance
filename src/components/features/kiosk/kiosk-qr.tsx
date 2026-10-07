@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQrRotation } from "@/hooks/use-qr-rotation"
+import { QR_ROTATION_SECONDS } from "@/lib/qr-config"
 
 export function KioskQr({ timezone }: { timezone: string }) {
   const { qr, secondsLeft, error } = useQrRotation()
@@ -67,7 +68,7 @@ export function KioskQr({ timezone }: { timezone: string }) {
         <div className="h-2 w-64 overflow-hidden rounded-full bg-secondary" aria-hidden>
           <div
             className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-linear"
-            style={{ width: `${(secondsLeft / 60) * 100}%` }}
+            style={{ width: `${Math.min(secondsLeft / QR_ROTATION_SECONDS, 1) * 100}%` }}
           />
         </div>
         <p className="text-muted-foreground tabular-nums">{clock}</p>

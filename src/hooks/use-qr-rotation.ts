@@ -11,7 +11,7 @@ export interface QrRotationState {
   error: string | null
 }
 
-/** Fetches a fresh signed QR token whenever the current one expires (every minute). */
+/** Fetches a fresh signed QR token whenever the current one expires (every 30 seconds). */
 export function useQrRotation(): QrRotationState {
   const [qr, setQr] = useState<QrTokenResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -27,7 +27,7 @@ export function useQrRotation(): QrRotationState {
       if (result.ok) {
         setQr(result.data)
         setError(null)
-        // Small buffer so the server is already in the next minute bucket.
+        // Small buffer so the server is already in the next rotation window.
         timeout = setTimeout(load, Math.max(result.data.expiresAt - Date.now() + 250, 1000))
       } else {
         setError(result.error)

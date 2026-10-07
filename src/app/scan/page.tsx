@@ -41,7 +41,7 @@ async function ScanContent({ searchParams }: { searchParams: PageProps<"/scan">[
     return (
       <Notice
         title="QR sudah kedaluwarsa"
-        description="Kode QR berganti setiap menit. Scan ulang kode yang tampil di kiosk."
+        description="Kode QR berganti setiap 30 detik. Scan ulang kode yang tampil di kiosk."
       />
     )
   }

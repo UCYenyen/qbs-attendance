@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.siteUrl),
   title: { default: "QBS Presence", template: "%s · QBS Presence" },
   description:
-    "QBS Presence adalah aplikasi absensi karyawan QBS: scan QR yang berganti tiap menit untuk absen masuk dan pulang, atur jadwal, dan pantau kehadiran.",
+    "QBS Presence adalah aplikasi absensi karyawan QBS: scan QR yang berganti tiap 30 detik untuk absen masuk dan pulang, atur jadwal, dan pantau kehadiran.",
   applicationName: "QBS Presence",
   appleWebApp: { capable: true, title: "Presence", statusBarStyle: "default" },
   icons: { icon: "/icons/192", apple: "/icons/192" },
