@@ -38,6 +38,7 @@ No test runner is set up yet.
 `next.config.ts` turns on `cacheComponents`, `reactCompiler` and `partialPrefetching`.
 
 - Middleware is now **`src/proxy.ts`**.
+- `lib/supabase/server.ts` calls `await connection()` before creating the client. supabase-js reads `Date.now()` while loading the session, which Cache Components rejects during (partial) prerenders. That error made auth fail and wiped session cookies inside server actions.
 - With Cache Components on, anything that reads `cookies()` or `headers()` (that includes every Supabase session read) has to render inside a `<Suspense>` boundary. Otherwise the build fails.
   - Plain `use cache` can't read cookies. Pass values in as arguments, or use `use cache: private`.
 - Before using an unfamiliar API, read the relevant guide in `node_modules/next/dist/docs/`.
@@ -64,6 +65,7 @@ No test runner is set up yet.
 8. **Route handlers (`src/app/api/...`) are allowed when needed**, for example to sign Cloudinary uploads. Server actions are the default for mutations.
 9. **Keep pages server components.** Only leaf components that need interactivity, browser APIs (camera, service worker, push), or charts get `"use client"`. Never add `"use client"` to a `page.tsx`.
 10. **Every server `page.tsx` exports `metadata` or `generateMetadata`**, with at least a title and description. The root layout sets the title template.
+11. **All user-facing text is Bahasa Indonesia:** UI copy, metadata, validation and action messages, push notifications, emails and SQL error messages. Dates use the `id` date-fns locale (`formatWorkDate` / `formatInTz`). Code identifiers and comments stay in English.
 
 ## Architecture (key cross-cutting decisions)
 
@@ -85,6 +87,19 @@ No test runner is set up yet.
 - **Notifications:** `push_subscriptions` stores browser subscriptions, and the service worker is `public/sw.js`.
   - A pg_net trigger and pg_cron jobs call the Supabase edge functions `notify-admins` and `daily-attendance-summary`, which send web pushes with VAPID keys.
 - **Cloudinary:** uploads are signed and use `type: authenticated`. Selfies go to `qbs-presence/selfies/{userId}` and documents to `qbs-presence/documents/{userId}`. Store the `public_id`. Admins view files through signed URLs created on the server.
+
+## Deployment
+
+- **Vercel:** project `qbs-attendance` (team `ucyenyens-projects`), production URL https://qbs-attendance.vercel.app. Deploy with `vercel deploy --prod`. Env vars are set in Vercel (Production); `NEXT_PUBLIC_SITE_URL` must match the production URL because the QR codes and invite links use it.
+- **Supabase:** hosted project `qbs-attendance` (ref `bmaqahwykmteikozhuke`, org "Queen Baby Shop"), already linked.
+  - Apply migrations: `supabase db push --linked`
+  - Deploy functions: `supabase functions deploy notify-admins daily-attendance-summary`
+  - Function secrets: `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`
+  - Vault secrets (SQL): `project_url` and `cron_secret`
+- `SUPABASE_SECRET_KEY` currently holds the legacy `service_role` JWT. The CLI only returns new `sb_secret_` keys masked, so a new key has to be copied from the dashboard.
+- Supabase free tier: custom email templates need custom SMTP. Invites use the default template, which lands on `/auth/callback` (the session arrives in the URL hash). `/auth/confirm` (token_hash) is only for when a custom template is configured.
+- `supabase/config.toml`: `[auth.email] enable_signup` toggles the whole email provider, login included, so keep it `true`. Public sign-up is turned off by `[auth] enable_signup = false`. Preview any `supabase config push` first (`echo n | supabase config push`), because local defaults can overwrite remote settings.
+- `supabase/seed.sql` only creates the admin account (bryanfernandodinata@gmail.com, default password `password123`). It is safe to run more than once, so it can also bootstrap the hosted project from the SQL Editor after `db push`. Change the password right after.
 
 ## Supabase rules
 
